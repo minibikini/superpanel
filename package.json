@@ -15,17 +15,27 @@
   "bugs": {
     "url": "https://github.com/minibikini/superpanel/issues"
   },
+  "bin": "./lib/cli.coffee",
   "homepage": "https://github.com/minibikini/superpanel#readme",
+  "browserify": {
+    "transform": [
+      "coffee-reactify"
+    ]
+  },
   "dependencies": {
     "bluebird": "^2.9.26",
     "browserify": "^10.2.1",
     "bunyan": "^1.3.5",
     "bunyan-format": "^0.2.1",
+    "chart.js": "^1.0.2",
     "classnames": "^2.1.1",
+    "coffee-react": "^3.2.0",
     "coffee-reactify": "^3.0.0",
     "coffee-script": "^1.9.2",
+    "commander": "^2.8.1",
     "debug": "^2.2.0",
     "es6-promise": "^2.1.1",
+    "glob": "^5.0.10",
     "gulp": "^3.8.11",
     "gulp-coffee": "^2.3.1",
     "gulp-concat": "^2.5.2",
@@ -35,7 +45,8 @@
     "gulp-sass": "^2.0.1",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.4",
-    "inflecto": "^1.3.0",
+    "inflecto": "^1.4.0",
+    "isomorphic-fetch": "^2.1.0",
     "koa": "^0.21.0",
     "koa-body": "^1.2.1",
     "koa-compress": "^1.0.8",
@@ -45,13 +56,30 @@
     "koa-favicon": "^1.2.0",
     "koa-json": "^1.1.1",
     "koa-logger": "^1.2.2",
+    "koa-mount": "^1.3.0",
+    "koa-router": "^5.0.1",
     "koa-static": "^1.4.9",
     "lodash": "^3.9.3",
     "moment": "^2.10.3",
+    "moment-timezone": "^0.4.0",
+    "newforms": "^0.12.1",
     "numeral": "^1.5.3",
+    "qs": "^3.1.0",
     "react": "^0.13.3",
+    "react-chartjs": "^0.6.0",
+    "react-d3": "^0.3.1",
+    "react-d3-components": "^0.4.8",
+    "react-foundation-apps": "^0.6.1",
+    "react-pager": "^1.1.1",
+    "react-responsive-mixin": "^0.3.3",
     "react-router": "^0.13.3",
-    "require-directory": "^2.1.0",
+    "react-simple-table": "^0.6.0",
+    "require-directory": "^2.1.1",
+    "rethinkdbdash": "^2.0.10",
+    "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.1"
+  },
+  "devDependencies": {
+    "koa-qs": "^2.0.0"
   }
 }

@@ -1,0 +1,22 @@
+{
+  "name": "superpanel",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/minibikini/superpanel",
+  "authors": [
+    "Egor Kislitsyn <egor@kislitsyn.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome": "~4.3.0",
+    "foundation-apps": "~1.1.0"
+  }
+}

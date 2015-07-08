@@ -1,2 +1,3 @@
-require('coffee-script/register');
-require('./lib/server');
+require('coffee-react/register');
+module.exports = require('./lib/index');
+

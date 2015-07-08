@@ -1,0 +1,6 @@
+module.exports =
+  index: "GET /"
+  create: "POST /"
+  get: "GET /:id"
+  update: "PUT /:id"
+  delete: ""

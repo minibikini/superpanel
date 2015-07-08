@@ -1,7 +1,7 @@
 bunyan = require('bunyan')
 bformat = require 'bunyan-format'
 _ = require 'lodash'
-appConfig = require '../config/config'
+appConfig = require __dirname + '/../config/config'
 
 config =
  name: appConfig.name

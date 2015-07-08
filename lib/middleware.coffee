@@ -48,7 +48,9 @@ module.exports =
       @status = error.status
 
       @body = if @originalUrl.startsWith '/api'
-        error: copyObject error
+        e = copyObject error
+        e.message = error.message
+        error: e
       else "Server Error: #{error.message or error.status}"
 
       @app.emit 'error', error, @
