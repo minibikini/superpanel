@@ -1,30 +1,17 @@
-#!/usr/bin/env coffee
-
-program = require('commander')
 pkg = require __dirname + "/../package"
 defaultConfig = require __dirname + "/../config/config"
 
-Path = require('path')
 # _ = require 'lodash'
 Promise = require 'bluebird'
 glob = require 'glob'
 # fs = Promise.promisifyAll require 'fs'
+logger = require './logger'
 
 
-
-program
-  .version(pkg.version)
-  # .option('-p, --peppers', 'Add peppers')
-  # .option('-P, --pineapple', 'Add pineapple')
-  .option('-b, --build', 'Build the client app')
-  .option '-p, --path [path/to/project]', 'path to the project folder (default is current directory)', '.'
-  .parse(process.argv);
-
-projectRoot = Path.resolve process.cwd(), program.path
+{projectRoot, program} = require './cli.js'
 
 runServer = ->
   server = require './server'
-  logger = require './logger'
 
   getResourcesList = ->
     new Promise (resolve, reject) ->
@@ -78,7 +65,51 @@ runServer = ->
       # logger.debug schema
 
 
-if program.build
-  console.log 'build'
+if program.build or program.watch
+  webpack = require("webpack")
+  compiler = webpack require("../webpack.config")
+
+  if program.build
+    buildBeginAt = Date.now()
+    logger.info "Building the browser app"
+    compiler.run (err, stats) ->
+      logger.error err if err?
+      logger.debug stats.toString(colors: true)
+      logger.info "Build done in #{Date.now() - buildBeginAt} ms"
+
+  if program.watch
+    logger.info "Watch changes and rebuild the browser app"
+    # compiler.watch {aggregateTimeout: 300}, (err, stats) ->
+    #   logger.error err if err?
+    #   logger.debug stats.toString(colors: true)
+    #   logger.info "Bundle updated"
+
+    WebpackDevServer = require("webpack-dev-server")
+    server = new WebpackDevServer compiler,
+      publicPath: require("../webpack.config").output.publicPath
+      stats:
+        colors: true
+      hot: true
+      historyApiFallback: true
+      # // webpack-dev-server options
+      # contentBase: '../public/build/'
+      # // or:
+      contentBase: "http://localhost:8181/build/",
+      headers: { "Access-Control-Allow-Origin": "*" }
+      proxy: {
+        "*": "http://localhost:1337"
+      }
+
+      # // webpack-dev-middleware options
+      # quiet: false,
+      # noInfo: false,
+      # lazy: true,
+      # watchOptions: {
+      #   aggregateTimeout: 300,
+      #   poll: 1000
+      # },
+
+    server.listen 8181, "localhost", ->
+      logger.info "Dev server is ready"
 else
   runServer()
