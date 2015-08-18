@@ -23,5 +23,6 @@ belt =
   formatters: require '../lib/formatters'
   # cdnUrl: require '../../lib/cdnUrl'
   # PageMixin: require './mixins/PageMixin'
+  magicRequire: require './lib/magicRequire'
 
 module.exports = belt
