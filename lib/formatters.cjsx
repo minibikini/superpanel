@@ -1,10 +1,10 @@
 _ = require 'lodash'
-config = require '../config/config'
+# config = require '../config/config'
 
 {Link} = require 'react-router'
 
 
-getCurrencySymbol = (currency) ->
+getCurrencySymbol = (currency = "THB") ->
   switch currency
     when 'USD','ARS', 'BSD', 'BBD', 'BZD', 'BRL', 'BND', 'CAD', 'KYD', 'CLP', 'COP', 'DOP', 'SVC', 'FJD', 'GYD','HKD', 'JMD', 'LRD', 'MXN', 'NAD', 'NZD', 'NIO', 'SGD', 'SBD', 'SRD','TWD', 'TTD', 'ZWD'
       '$'
@@ -38,7 +38,7 @@ module.exports =
 
   money: (schema, row, opts) ->
     path = opts.path or opts._path
-    "#{_.get row, path} #{getCurrencySymbol opts.currency or config.currency}"
+    "#{_.get row, path} #{getCurrencySymbol opts.currency}"
 
   userFullName: (schema, row, opts) ->
     path = opts.path or opts._path

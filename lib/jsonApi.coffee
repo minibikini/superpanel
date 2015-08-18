@@ -1,6 +1,7 @@
 _ = require 'lodash'
 
-showLinks = _.get require('../config/config'), 'api.showLinks'
+# showLinks = _.get require('../config/config'), 'api.showLinks'
+showLinks = no
 
 serialize = (input, schema) ->
   return {} unless input
