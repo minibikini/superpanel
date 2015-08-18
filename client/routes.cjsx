@@ -1,9 +1,9 @@
-{Route, DefaultRoute, Router, helpers, RouteHandler} = require './toolbelt'
+{Route, DefaultRoute, Router, helpers, RouteHandler, magicRequire} = require './toolbelt'
 
 config = _config or {}
 ResourceSchema = require '../lib/ResourceSchema'
 CollectionIndex = require './views/CollectionIndex'
-CollectionItem = require './views/CollectionItem'
+DefaultCollectionItem = require './views/CollectionItem'
 getCollectionItemRelated = require './views/getCollectionItemRelated'
 getCollectionItemContainer = require './views/getCollectionItemContainer'
 getCreateItemView = require './views/getCreateItemView'
@@ -22,6 +22,7 @@ config.resources.forEach (resource) ->
   nameItem = resource.getRouteName 'Show'
   relatedRoutes = []
   relations = resource.getRelations()
+  CollectionItem = magicRequire "./#{resource.getTableName()}/views/CollectionItem", 'resource', DefaultCollectionItem
 
   createRoute = if resource.get('views.create')
     routeName = resource.getRouteName 'Create'
@@ -42,7 +43,7 @@ config.resources.forEach (resource) ->
 
 module.exports =
   <Route name="app" path="/" handler={require './views/App'}>
-    <DefaultRoute handler={require './views/Dashboard'} />
+    <DefaultRoute handler={magicRequire './views/Dashboard'} />
     {collectionRoutes}
     {# <Route name="faq" handler={require './views/FAQ'} />}
     {# <Router.NotFoundRoute handler={require './views/NotFound'}/>}
