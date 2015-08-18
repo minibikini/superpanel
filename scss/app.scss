@@ -1,0 +1,75 @@
+
+@import "settings";
+@import "spinner";
+@import "tables";
+@import "pager";
+@import "foundation";
+
+$fa-font-path: "/bower_components/font-awesome/fonts" ;
+@import "font-awesome";
+
+
+$top-margin: 1rem;
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+.menu-bar {
+  #sidebar & {
+    padding-top: 1rem;
+  }
+  a.active, a.active:hover {
+    background-color: $info-color !important;
+  }
+}
+
+
+.content-block {
+  > div {
+    width: 100%;
+  }
+  margin: $top-margin 3rem;
+  overflow: auto;
+  width: 100%;
+  .gird-block.text-center {
+    overflow-y: hidden !important;
+  }
+}
+
+  .grid-block.text-center {
+    overflow-y: hidden !important;
+  }
+
+
+.gird-block {
+  overflow: auto;
+}
+
+table {
+  &.horizontal {
+    th {
+      text-align: left;
+    }
+  }
+  .button {
+    margin: 0;
+  }
+}
+
+
+.charts {
+  .rd3-linechart-yaxis g.tick {
+    width: 100px;
+  }
+}
+
+
+.list-controls {
+  margin-bottom: 1rem;
+  width: 100%;
+  form > div > div {
+    width: 200px;
+    float: left;
+  }
+}
