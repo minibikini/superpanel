@@ -1,20 +1,22 @@
+_ = require 'lodash'
 Router = require('koa-router')
 koaBody = require('koa-body')()
-
-_ = require 'lodash'
 logger = require './logger'
 r = require './db'
 getIndexRestResponse = require './getIndexRestResponse'
-
 {serialize, deserialize} = require './jsonApi'
-
 showLinks = _.get require('../config/config'), 'api.showLinks'
-
 
 module.exports = (schema) ->
   router = Router()
 
   $table = r.table schema.getTableName()
+
+  updateItem = ->
+    {data, included} = @request.body
+    update = deserialize data, schema, included
+    result = yield $table.get(@params.id).update update, returnChanges: yes
+    @body = data: serialize _.get(result, 'changes[0].new_val'), schema
 
   router.param 'id', (id, next) ->
     @throw 404 unless @record = yield $table.get id
@@ -25,24 +27,23 @@ module.exports = (schema) ->
 
   .post '/', koaBody, ->
     {data, included} = @request.body
-    # data.createdBy = @user.id
     newRecord = deserialize data, schema, included
     newRecord.createdAt = new Date
     result = yield $table.insert newRecord, returnChanges: yes
-    console.log serialize _.get(result, 'changes[0].new_val'), schema
     @body = data: serialize _.get(result, 'changes[0].new_val'), schema
     @status = 201
-
-  #   @body = coupon: yield Coupon.create data
 
   .get '/:id', ->
     yield []
     data = serialize @record, schema
     @body = {data} or @throw 404
 
+  .patch '/:id', koaBody, updateItem # jsonapi
+  .post '/:id', koaBody, updateItem
+  .put '/:id', koaBody, updateItem
+
   .delete '/:id', ->
     @throw 404 unless @isAdmin
-    # data = yield Order.getWithRelated(@params.id)
 
     yield $table.get(@params.id).detele()
     @body = {}
