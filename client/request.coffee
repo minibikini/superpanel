@@ -3,15 +3,13 @@ require('isomorphic-fetch')
 qs = require('qs')
 
 request = (url, opts = {}) ->
-  # # fetch based implementation
-  #
   url += "?" + qs.stringify opts.query if opts.query
 
   opts.credentials = 'include'
   opts.headers ?= {}
   opts.headers['Accept'] = 'application/json'
 
-  if opts.method is 'post' and opts.body
+  if opts.method in ['POST', 'PUT', 'PATCH'] and opts.body
     opts.headers['Content-Type'] = 'application/json'
     opts.body = JSON.stringify opts.body
 
@@ -29,8 +27,8 @@ request = (url, opts = {}) ->
 
   .then (response) -> response.json()
 
-request.post = (url, body) ->
-  method = 'post'
-  request url, {method, body}
+['post', 'put', 'patch'].forEach (key) ->
+  method = key.toUpperCase()
+  request[key] = (url, body) -> request url, {method, body}
 
 module.exports = request
