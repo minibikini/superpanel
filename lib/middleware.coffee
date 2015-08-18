@@ -5,6 +5,8 @@ _ = require 'lodash'
 logger = require './logger'
 {copyObject} = require './helpers'
 
+isDev = process.env.NODE_ENV isnt 'production'
+
 module.exports =
   ensureAuthenticated: (next) ->
     if @isAuthenticated()
@@ -54,3 +56,23 @@ module.exports =
       else "Server Error: #{error.message or error.status}"
 
       @app.emit 'error', error, @
+
+  serveIndex: ->
+    yield []
+    @body = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Superpanel</title>
+        <link rel="stylesheet" href="/build/bundle.css">
+    </head>
+    <body>
+    """
+    @body += '   <script src="/webpack-dev-server.js"></script>' if isDev
+    @body += """
+      <script src="/build/bundle.js"></script>
+    </body>
+    </html>
+    """

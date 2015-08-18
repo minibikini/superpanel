@@ -8,11 +8,11 @@ process.on 'uncaughtException', (err) ->
 
 mount = require 'koa-mount'
 compress = require 'koa-compress'
-# Router = require('koa-router')
+Router = require('koa-router')
 
 
 
-{setupContext, responseTime, staticFolder, errorHandler} = require './middleware'
+{setupContext, responseTime, staticFolder, errorHandler, serveIndex} = require './middleware'
 
 module.exports = (resources, controllers) ->
   config = require '../config/config'
@@ -50,14 +50,15 @@ module.exports = (resources, controllers) ->
   # app.use setupContext
   app.use require('koa-json')(pretty: no, param: 'pretty')
 
-
-  # create api for apis
-  # schema = require '../superpanel'
+  router = new Router()
+  router.get '/', serveIndex
+  app.use router.routes()
 
   app.use mount '/api/_config', ->
     yield []
     @body = {resources}
 
+  # create api for apis
   for resource in resources
     resource = new ResourceSchema resources, resource
     logger.debug "setting up `#{resource.getUrl()}`"
