@@ -1,6 +1,9 @@
 path = require('path')
 webpack = require('webpack')
+_ = require 'lodash'
 ExtractTextPlugin = require("extract-text-webpack-plugin")
+
+isProd = process.env.NODE_ENV is 'production'
 
 publicJsPath = path.join(__dirname, "public/build")
 {projectRoot} = require './lib/cli.js'
@@ -17,37 +20,15 @@ sassOpts = ""
 for dir in ["foundation-apps/scss/", "font-awesome/scss/"]
   sassOpts += "includePaths[]=#{__dirname}/public/bower_components/#{dir}&"
 
-module.exports =
-  entry: [
-    "#{__dirname}/node_modules/webpack-dev-server/client?http://localhost:8181",
-    "#{__dirname}/node_modules/webpack/hot/only-dev-server",
-    "#{__dirname}/client/index"
-  ]
-  devtool: "eval"
-  debug: true,
+commonConfig =
   output:
     path: publicJsPath
     filename: 'bundle.js'
     publicPath: '/build/'
 
-  # devServer:
-  #   contentBase: "/build/",
-  #   publicPath: publicJsPath
-  #   headers: { "Access-Control-Allow-Origin": "*" }
-
   resolveLoader:
     modulesDirectories: [__dirname + '/node_modules', 'node_modules']
 
-  preprocessors:
-    "#{publicJsPath}/bundle.js": ['webpack', 'sourcemap']
-
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-    new webpack.NoErrorsPlugin()
-    new webpack.IgnorePlugin(/vertx/)
-    new ExtractTextPlugin("bundle.css")
-    definePlugin
-  ]
   resolve:
     extensions: ['', '.jsx', '.js', '.cjsx', '.coffee']
 
@@ -79,3 +60,43 @@ module.exports =
         loader: "url?limit=10000&mimetype=image/svg+xml"
       }
     ]
+
+
+devConfig =
+  entry: [
+    "#{__dirname}/node_modules/webpack-dev-server/client?http://localhost:8181",
+    "#{__dirname}/node_modules/webpack/hot/only-dev-server",
+    "#{__dirname}/client/index"
+  ]
+  devtool: "eval"
+  debug: true
+  preprocessors:
+    "#{publicJsPath}/bundle.js": ['webpack', 'sourcemap']
+
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+    new webpack.NoErrorsPlugin()
+    new webpack.IgnorePlugin(/vertx/)
+    new ExtractTextPlugin("bundle.css")
+    definePlugin
+  ]
+
+prodConfig =
+  entry: [
+    "#{__dirname}/client/index"
+  ]
+  debug: no
+
+  plugins: [
+    new ExtractTextPlugin("bundle.css")
+    new webpack.NoErrorsPlugin()
+    new webpack.IgnorePlugin(/vertx/)
+    definePlugin
+    new webpack.optimize.DedupePlugin()
+    new webpack.optimize.UglifyJsPlugin(sourceMap: no)
+  ]
+
+module.exports = if isProd
+  _.defaults prodConfig, commonConfig
+else
+  _.defaults devConfig, commonConfig
