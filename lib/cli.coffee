@@ -94,8 +94,8 @@ if program.build or program.watch
       # // webpack-dev-server options
       # contentBase: '../public/build/'
       # // or:
-      contentBase: "http://localhost:8181/build/",
-      headers: { "Access-Control-Allow-Origin": "*" }
+      # contentBase: "http://localhost:8181/build/",
+      # headers: { "Access-Control-Allow-Origin": "*" }
       proxy: {
         "*": "http://localhost:1337"
       }

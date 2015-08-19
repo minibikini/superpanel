@@ -30,10 +30,10 @@ module.exports =
     filename: 'bundle.js'
     publicPath: '/build/'
 
-  devServer:
-    contentBase: "http://localhost:8181/build/",
-    publicPath: publicJsPath
-    headers: { "Access-Control-Allow-Origin": "*" }
+  # devServer:
+  #   contentBase: "/build/",
+  #   publicPath: publicJsPath
+  #   headers: { "Access-Control-Allow-Origin": "*" }
 
   resolveLoader:
     modulesDirectories: [__dirname + '/node_modules', 'node_modules']

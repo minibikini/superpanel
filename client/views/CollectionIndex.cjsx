@@ -26,7 +26,8 @@ opFields =
 module.exports = (schema) ->
   React.createClass
     mixins: [ Router.State ]
-    displayName: schema.getKeyName() + 'CollectionIndex'
+    # displayName: schema.getKeyName() + 'CollectionIndex'
+    displayName: 'ResourceCollectionIndex'
     schema: schema
     getInitialState: ->
       {query} = @props
@@ -66,7 +67,7 @@ module.exports = (schema) ->
         if filter.value
           _.set query, ['filter', filter.field, filter.op], filter.value
 
-      request(schema.getUrl(), {query}).then (reply) =>
+      request(@schema.getUrl(), {query}).then (reply) =>
         {meta, data, included} = reply
         totalPages = Math.ceil meta.total / meta.limit
         items = deserialize data, @schema, included
