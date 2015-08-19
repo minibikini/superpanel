@@ -21,8 +21,8 @@ class ResourceRelation
 
 module.exports = class ResourceSchema
   constructor: (@fullSchema, @_schema, @prefix = "/api/collections") ->
-    assert.notEqual @fullSchema
-    assert.notEqual @_schema
+    # assert.notEqual @fullSchema
+    # assert.notEqual @_schema
 
   getUrlName: ->
     @_schema.urlName or @_schema.path
