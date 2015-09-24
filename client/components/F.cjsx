@@ -3,7 +3,6 @@ React = require 'react'
 cx = require 'classnames'
 _ = require 'lodash'
 t = React.PropTypes
-# Accordion = require('react-foundation-apps/lib/accordion')
 
 classNameType = t.oneOfType [t.string, t.array, t.object,]
 

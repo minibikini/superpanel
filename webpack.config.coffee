@@ -64,8 +64,8 @@ commonConfig =
 
 devConfig =
   entry: [
-    "#{__dirname}/node_modules/webpack-dev-server/client?http://localhost:8181",
-    "#{__dirname}/node_modules/webpack/hot/only-dev-server",
+    # "#{__dirname}/node_modules/webpack-dev-server/client?http://localhost:8181",
+    # "#{__dirname}/node_modules/webpack/hot/only-dev-server",
     "#{__dirname}/client/index"
   ]
   devtool: "eval"

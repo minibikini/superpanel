@@ -70,7 +70,7 @@ module.exports =
     </head>
     <body>
     """
-    @body += '   <script src="/webpack-dev-server.js"></script>' if isDev
+    # @body += '   <script src="/webpack-dev-server.js"></script>' if isDev
     @body += """
       <script src="/build/bundle.js"></script>
     </body>

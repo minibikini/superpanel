@@ -24,9 +24,11 @@ module.exports = class ResourceSchema
     # assert.notEqual @fullSchema
     # assert.notEqual @_schema
 
+  getName: ->
+    @_schema.name or @_schema.path
+
   getUrlName: ->
     @_schema.urlName or @_schema.path
-
 
   getJsonApiType: ->
     @get('jsonApiType') or @get('path')
@@ -77,7 +79,6 @@ module.exports = class ResourceSchema
   getFormatter: (path) ->
     path = path?.replace(/\./g, ".properties.")
     @get "items.properties.#{path}.formatter"
-
 
   getFields: ->
     if props = @get('items.properties')
