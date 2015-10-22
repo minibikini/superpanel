@@ -2,24 +2,23 @@ _ = require 'lodash'
 Router = require('koa-router')
 koaBody = require('koa-body')()
 logger = require './logger'
-r = require './db'
+{store} = require './ds'
 getIndexRestResponse = require './getIndexRestResponse'
 {serialize, deserialize} = require './jsonApi'
 showLinks = _.get require('../config/config'), 'api.showLinks'
 
 module.exports = (schema) ->
   router = Router()
-
-  $table = r.table schema.getTableName()
+  modelName = schema.getName()
 
   updateItem = ->
     {data, included} = @request.body
     update = deserialize data, schema, included
-    result = yield $table.get(@params.id).update update, returnChanges: yes
-    @body = data: serialize _.get(result, 'changes[0].new_val'), schema
+    result = yield store.update modelName, @params.id, update
+    @body = data: serialize result, schema
 
   router.param 'id', (id, next) ->
-    @throw 404 unless @record = yield $table.get id
+    @throw 404 unless @record = yield store.find modelName, id
     yield next
 
   .get '/', ->
@@ -29,8 +28,8 @@ module.exports = (schema) ->
     {data, included} = @request.body
     newRecord = deserialize data, schema, included
     newRecord.createdAt = new Date
-    result = yield $table.insert newRecord, returnChanges: yes
-    @body = data: serialize _.get(result, 'changes[0].new_val'), schema
+    result = yield store.create modelName, @params.id, newRecord
+    @body = data: serialize result, schema
     @status = 201
 
   .get '/:id', ->
@@ -45,7 +44,7 @@ module.exports = (schema) ->
   .delete '/:id', ->
     @throw 404 unless @isAdmin
 
-    yield $table.get(@params.id).detele()
+    yield store.destroy modelName, id
     @body = {}
     @body[schema.getSingularKey()] = null
 
@@ -59,8 +58,12 @@ module.exports = (schema) ->
 
       when 'belongsTo'
         router.get "/:id/#{rel.name}", ->
-          items = yield r.table(rel.getSchema().getTableName()).getAll @record[rel.ownKey], index: rel.getIndex()
-          @body = data: serialize items[0], rel.getSchema()
+          # doesn't work :(
+          # record = yield store.loadRelations modelName, @record, [rel.resource]
+
+          record = yield store.find modelName, @params.id, with: [rel.resource]
+
+          @body = data: serialize record[rel.name], rel.getSchema()
 
         router.get "/:id/relationships/#{rel.name}", ->
           yield []

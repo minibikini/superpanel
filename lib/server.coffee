@@ -10,7 +10,7 @@ mount = require 'koa-mount'
 compress = require 'koa-compress'
 Router = require('koa-router')
 
-
+store = require './ds'
 
 {setupContext, responseTime, staticFolder, errorHandler, serveIndex} = require './middleware'
 
@@ -62,6 +62,7 @@ module.exports = (resources, controllers) ->
   for resource in resources
     resource = new ResourceSchema resources, resource
     logger.debug "setting up `#{resource.getUrl()}`"
+    store.initModel resource
     app.use mount resource.getUrl(), require('./restApiController')(resource)
 
   for path, controller of controllers

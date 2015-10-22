@@ -2,11 +2,12 @@ Promise = require 'bluebird'
 inflecto = require 'inflecto'
 _ = require 'lodash'
 r = require './db'
+{store} = require './ds'
 
 {serialize} = require './jsonApi'
 
-
 getForeignKey = (relName) -> inflecto.singularize(relName) + 'Id'
+
 getRelationTable = (relName) ->
   r.table inflecto.underscore relName
 
@@ -22,68 +23,50 @@ enforceType = (schema, key, value) ->
 
 
 module.exports = (schema, query) ->
-  $table = r.table schema.getTableName()
+  modelName = schema.getName()
 
   limit = Number query.limit or 20
   limit = 300 if limit > 300
   offset = Number query.offset or 0
 
   {include, index, indexValue, filter, sort} = query
+  sort ?= '-createdAt'
 
-  dbQuery = $table
-
-  if index and indexValue
-    dbQuery = dbQuery.getAll indexValue, {index}
-
-  unless sort
-    if not indexValue
-      dbQuery = dbQuery.orderBy index: r.desc 'createdAt'
+  orderBy = for field in sort.split(',')
+    if field[0] is '-'
+      [field[1..], 'DESC']
     else
-      sort = '-createdAt'
+      [field, 'ASC']
 
-  if filter
-    filterChain = r.expr(1).eq(1)
+  params = {where: filter, limit, offset, orderBy}
 
-    for key, opVal of filter
-      for op, val of opVal
-        throw code: 'invalid_filter' unless op in allowedFilterOperators
-        filterChain = filterChain.and r.row(key)[op](enforceType schema, key, val)
+  if include
+    withRels = for name in include.split(',')
+      schema.getRelation(name).resource
 
-    dbQuery = dbQuery.filter filterChain
+  store.findAll(modelName, params, {with: withRels}).then (records) ->
+    include = include.split(',') if include
+    total = null
 
-  if sort
-    orderBy = if sort[0] is '-' then r.desc sort[1...] else r.asc sort
-    dbQuery = dbQuery.orderBy orderBy
+    reply = meta: {total, limit, offset, include, sort, filter}
 
-  dbQuery
-  .skip offset
-  .limit limit
-  .then (records) ->
-    dbQuery.count().then (total) ->
-      include = include.split(',') if include
+    relatedRecords = []
+    relatedIds = {}
 
-      reply = meta: {total, limit, offset, include, sort, filter}
-      reply.data = serialize records, schema
+    for record in records
+      for relKey in schema.getRelationKeys() when record[relKey]?
+        if relKey in include
+          relResource = schema.getRelation(relKey).resource
+          relSchema = schema.getSchemaFor relResource
+          relPk = relSchema.getPk()
+          relatedIds[relResource] ?= []
+          if record[relKey][relPk] not in relatedIds[relResource]
+            relatedIds[relResource].push record[relKey][relPk]
+            relatedRecords.push serialize record[relKey], schema.getSchemaFor relResource
 
-      if include
-        relatedRecords = []
-        relatedIds = {}
-        include.forEach (relName) ->
-          items = _.compact _.pluck reply.data, ['relationships', relName, 'data']
-          relatedRecords.push items if items.length
+        delete record[relKey]
 
-        relatedRecords = _.unique _.flatten(relatedRecords), (i) -> i.type + i.id
 
-        for relrec in relatedRecords
-          relatedIds[relrec.type] ?= []
-          relatedIds[relrec.type].push relrec.id
-
-        getIncluded = for table, ids of relatedIds
-          do (table, ids) ->
-            r.table(table).getAll.apply(r.table(table), ids).then (res) ->
-              serialize res, schema.getSchemaFor table
-
-        reply.included = Promise.all(getIncluded).then (res) ->
-          _.flatten res
-
-      Promise.props reply
+    reply.data = serialize records, schema
+    reply.included = relatedRecords if include
+    reply
