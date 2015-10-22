@@ -17,7 +17,7 @@ module.exports = _.defaults config,
     port: 1337
 
   rethinkdb:
-    db: 'test'
+    db: 'mobiletopup'
 
   # api:
   #   showLinks: yes
