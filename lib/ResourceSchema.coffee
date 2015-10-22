@@ -49,8 +49,11 @@ module.exports = class ResourceSchema
     @_schema.singularKey or camelize singularize @_schema.path
 
   getRelations: ->
-    @_rels or @_rels = for rel in @get('items.relations') or []
+    @_rels ?= for rel in @get('items.relations') or []
       new ResourceRelation rel, @fullSchema
+
+  getRelationKeys: ->
+    @_relKeys ?= (rel.name for rel in @getRelations())
 
   getRelation: (name) ->
     _.find @getRelations(), {name}
