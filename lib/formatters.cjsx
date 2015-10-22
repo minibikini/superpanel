@@ -55,6 +55,9 @@ module.exports =
       when 'paid' then <span className="success label">Paid</span>
       when 'failed' then <span className="alert label">Failed</span>
       when 'new' then <span className="warning label">New</span>
+      when 'new' then <span className="warning label">Failed Rules</span>
+      else <span className="label">{row.status}</span>
+
 
   orderTopupStatus: (schema, row, opts) ->
     unless row.topup?.status?
