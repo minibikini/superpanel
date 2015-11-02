@@ -35,7 +35,7 @@ commonConfig =
   module:
     loaders: [
       # { test: /\.css$/, loaders: ['style', 'css']},
-      { test: /\.scss$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader?#{sassOpts}")},
+      # { test: /\.scss$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader?#{sassOpts}")},
       { test: /\.cjsx$/, loaders: ['react-hot', 'coffee', 'cjsx']},
       { test: /\.jsx$/, loaders: ['react-hot', 'babel']},
       { test: /\.json$/, loader: 'json'}
