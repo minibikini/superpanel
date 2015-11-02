@@ -79,37 +79,37 @@ if program.build or program.watch
 
   if program.watch
     logger.info "Watch changes and rebuild the browser app"
-    # compiler.watch {aggregateTimeout: 300}, (err, stats) ->
-    #   logger.error err if err?
-    #   logger.debug stats.toString(colors: true)
-    #   logger.info "Bundle updated"
+    compiler.watch {aggregateTimeout: 300}, (err, stats) ->
+      logger.error err if err?
+      logger.debug stats.toString(colors: true)
+      logger.info "Bundle updated"
 
-    WebpackDevServer = require("webpack-dev-server")
-    server = new WebpackDevServer compiler,
-      publicPath: require("../webpack.config").output.publicPath
-      stats:
-        colors: true
-      hot: true
-      historyApiFallback: true
-      # // webpack-dev-server options
-      # contentBase: '../public/build/'
-      # // or:
-      # contentBase: "http://localhost:8181/build/",
-      # headers: { "Access-Control-Allow-Origin": "*" }
-      proxy: {
-        "*": "http://localhost:1337"
-      }
+    # WebpackDevServer = require("webpack-dev-server")
+    # server = new WebpackDevServer compiler,
+    #   publicPath: require("../webpack.config").output.publicPath
+    #   stats:
+    #     colors: true
+    #   hot: true
+    #   historyApiFallback: true
+    #   # // webpack-dev-server options
+    #   # contentBase: '../public/build/'
+    #   # // or:
+    #   # contentBase: "http://localhost:8181/build/",
+    #   # headers: { "Access-Control-Allow-Origin": "*" }
+    #   proxy: {
+    #     "*": "http://localhost:1337"
+    #   }
 
-      # // webpack-dev-middleware options
-      # quiet: false,
-      # noInfo: false,
-      # lazy: true,
-      # watchOptions: {
-      #   aggregateTimeout: 300,
-      #   poll: 1000
-      # },
+    #   # // webpack-dev-middleware options
+    #   # quiet: false,
+    #   # noInfo: false,
+    #   # lazy: true,
+    #   # watchOptions: {
+    #   #   aggregateTimeout: 300,
+    #   #   poll: 1000
+    #   # },
 
-    server.listen 8181, "localhost", ->
-      logger.info "Dev server is ready"
+    # server.listen 8181, "localhost", ->
+    #   logger.info "Dev server is ready"
 else
   runServer()
