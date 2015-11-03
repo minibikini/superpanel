@@ -86,4 +86,5 @@ module.exports = class ResourceSchema
   getFields: ->
     if props = @get('items.properties')
       for key, {displayName} of props
-        [key, displayName or titleize underscore key]
+        value: key, label: displayName or titleize underscore key
+    else []

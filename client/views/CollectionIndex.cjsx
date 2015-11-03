@@ -1,34 +1,22 @@
-{React, Router, Spinner, request, _, moment, Link, config, formatters, F} = require '../toolbelt'
+{React, Router, Spinner, request, _, moment, Link, config, formatters, F, findDOMNode} = require '../toolbelt'
 {camelize, titleize, underscore, capitalize} = require 'inflecto'
 {deserialize} = require '../../lib/jsonApi'
-{RenderForm} = forms = require 'newforms'
+
+CollectionIndexFilterForm = require '../components/CollectionIndexFilterForm'
+CollectionIndexPager = require '../components/CollectionIndexPager'
+
 {Icon} = F
 Table = require 'react-simple-table'
-Pager = require 'react-pager'
 
 formatDate = (path, format = 'lll') -> (row) ->
   moment(_.get row, path).format format
 
-
-opFields =
-  [
-   ['startsWith', 'Starts With']
-   ['match', 'RegExp']
-   ['eq', '==']
-   ['ne', '!=']
-   ['gt', '>']
-   ['ge', '>=']
-   ['lt', '<']
-   ['le', '<=']
- ]
-
-
 module.exports = (schema) ->
   React.createClass
     mixins: [ Router.State ]
-    # displayName: schema.getKeyName() + 'CollectionIndex'
     displayName: 'ResourceCollectionIndex'
     schema: schema
+    getTitle: -> @schema.getTitle()
     getInitialState: ->
       {query} = @props
       currentPage = if query.page then query.page - 1 else 0
@@ -39,17 +27,11 @@ module.exports = (schema) ->
       currentPage: currentPage
       visiblePages: 10
       totalPages: 0
-      filter: null
+      filter: query.filter or {value:''}
 
-    getTitle: -> @schema.getTitle()
-
-    refresh: ->
+    componentDidMount: ->
       @setState isLoading: yes
       @load()
-
-    componentDidMount: -> @refresh()
-
-    # componentWillUpdate: ->
 
     load: ->
       offset = Math.ceil @state.currentPage * @state.perPage
@@ -63,7 +45,6 @@ module.exports = (schema) ->
           filter.op = 'match'
           filter.value = '(?i)^' + filter.value
 
-        # query.filter = {}
         if filter.value
           _.set query, ['filter', filter.field, filter.op], filter.value
 
@@ -72,7 +53,8 @@ module.exports = (schema) ->
         totalPages = Math.ceil meta.total / meta.limit
         items = deserialize data, @schema, included
         @setState {meta, items, totalPages, isLoading: no}
-      .catch (e) -> console.log e
+      .catch (e) ->
+        console.error e
 
     handlePageChanged: (newPage) ->
       query = @context.router.getCurrentQuery()
@@ -84,11 +66,13 @@ module.exports = (schema) ->
       @setState {isLoading: yes, currentPage: newPage}, =>
         @load newPage
 
+    updateFilter: (filter) ->
+      @setState {filter}
+
     getActionLink: (item, action) ->
       action = {name: action, displayName: titleize(underscore(action))} if _.isString action
       to = @schema.getRouteName capitalize action.name
       <Link className="button" key={to} to={to} params={{id: item.id}}>{action.displayName}</Link>
-
 
     getColumns: ->
       fields = @schema.get 'views.index.fields'
@@ -97,7 +81,6 @@ module.exports = (schema) ->
           for key, value of @state.items[0] when not _.isArray(value) and not _.isObject(value)
             key
         else []
-
 
       fields = for f in fields
         do (f) =>
@@ -112,7 +95,6 @@ module.exports = (schema) ->
               when 'datetime' then formatDate f.path, fieldSchema.dateFormat or 'lll'
               when 'date' then formatDate f.path, fieldSchema.dateFormat or 'll'
               else undefined
-
 
           formatter = f.formatter or @schema.getFormatter f.path
           if formatter
@@ -133,6 +115,22 @@ module.exports = (schema) ->
               if id = _.get row, idPath
                 <Link to={to} params={{id}}>{getLinkText(row, f._path)}</Link>
 
+          #  link to filter
+          if f.link and f.link.type is 'filter'
+            f.link.to ?= @context.router.getCurrentPathname()
+
+            getLinkText = (row, path) =>
+              if formatter
+                formatters.get(formatter)(@schema, row, f)
+              else
+                _.get(row, path)
+
+            f.function = (row) =>
+              filter = _.defaults {}, f.link.filter, value: _.get(row, f._path)
+              if f.link.to is @context.router.getCurrentPathname()
+                <Link to={f.link.to} onClick={@updateFilter.bind(@, filter)} query={{filter}}>{getLinkText(row, f._path)}</Link>
+              else
+                <Link to={f.link.to} query={{filter}}>{getLinkText(row, f._path)}</Link>
 
           delete f.path if f.function?
           f
@@ -144,76 +142,46 @@ module.exports = (schema) ->
 
       fields
 
-
-    getPager: ->
-      return unless @state.totalPages
-
-      <Pager total={@state.totalPages}
-         current={@state.currentPage}
-
-         {# Optional }
-         titles={{
-             first:   'First',
-             prev:    '\u00AB',
-             prevSet: '...',
-             nextSet: '...',
-             next:    '\u00BB',
-             last:    'Last'
-         }}
-
-         visiblePages={@state.visiblePages}
-         onPageChanged={@handlePageChanged}
-      />
-
     componentDidUpdate: ->
-      if $table = React.findDOMNode(@refs.table)
+      if $table = findDOMNode(@refs.table)
         {offsetHeight, offsetWidth} = $table
         offsetHeight = 100 if offsetHeight < 100
         @tableSize =
           width: offsetWidth
           height: offsetHeight
 
-    renderContent: ->
-      content = if @state.isLoading then <Spinner {...@tableSize} />
-      else if @state.items.length
-        <Table ref="table" key="collection-table" className="striped hover" columns={@getColumns()} data={@state.items} />
-      else ''
+    resetFilter: ->
+      path = @context.router.getCurrentPathname()
+      query = @context.router.getCurrentQuery()
+      delete query.page
+      delete query.filter
+      @context.router.transitionTo path, {}, query
+      @setState {filter: {value:''}, currentPage: 0, totalPages: 0, isLoading: yes}, =>
+        @load()
 
-      <div>
-        {content}
-        {@getPager()}
-      </div>
+    handleFilterChange: (filter) ->
+      path = @context.router.getCurrentPathname()
+      query = @context.router.getCurrentQuery()
+      delete query.page
 
+      if filter.value is ''
+        delete query.filter
+      else
+        query.filter = filter
 
-    handleFilterChange: ->
-      form = @refs.filterForm.getForm()
-      filter = if _.isEmpty(form.data.value) then null else form.data
-      @setState {filter, isLoading: yes}, => @load()
-
-
-    renderFilterForm: ->
-      Form = forms.Form.extend
-        field: forms.ChoiceField
-          choices: @schema.getFields() or []
-          label: no
-          initial: @schema.getFields()?[0]?[0]
-        op: forms.ChoiceField
-          choices: opFields
-          label: no
-          initial: 'startsWith'
-        value: forms.CharField label: no, required: no
-
-      form = new Form onChange: @handleFilterChange
-
-      <form onSubmit={@onSubmit}>
-        <RenderForm form={form} ref="filterForm" />
-      </form>
+      @context.router.transitionTo path,  {}, query
+      @setState {filter, currentPage: 0, totalPages: 0, isLoading: yes}, => @load()
 
     render: ->
       buttons = if @schema.get 'views.create'
         <div>
           <Link className="button" to={@schema.getRouteName 'Create'}><Icon name="plus"/> Create</Link>
         </div>
+
+      content = if @state.isLoading then <Spinner {...@tableSize} />
+      else if @state.items.length
+        <Table ref="table" key="collection-table" className="striped hover" columns={@getColumns()} data={@state.items} />
+      else ''
 
       <div>
         <div className="grid-block">
@@ -222,9 +190,17 @@ module.exports = (schema) ->
         </div>
         <div className="list-controls clearfix">
           <div className="float-right">Found: {@state.meta?.total or 0} Items</div>
-          <div className="filters">{@renderFilterForm()}</div>
+          <div className="filters">
+            <CollectionIndexFilterForm filter={@state.filter} schema={@schema} onChange={@handleFilterChange} />
+            <button className="button" onClick={@resetFilter}>Reset</button></div>
         </div>
 
-        {@renderContent()}
-      </div>
+        {content}
 
+        <CollectionIndexPager
+          totalPages={@state.totalPages}
+          currentPage={@state.currentPage}
+          visiblePages={@state.visiblePages}
+          onChange={@handlePageChanged}
+        />
+      </div>
