@@ -72,7 +72,8 @@ module.exports =
     """
     # @body += '   <script src="/webpack-dev-server.js"></script>' if isDev
     @body += """
-      <script src="/build/bundle.js"></script>
+      <div id="superpanel-app-container" />
+      <script src="/build/bundle.js"> </script>
     </body>
     </html>
     """

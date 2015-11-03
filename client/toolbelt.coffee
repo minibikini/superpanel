@@ -1,9 +1,12 @@
 Router = require('react-router')
 React = require 'react'
+ReactDOM = require('react-dom')
 
 belt =
   React: React
   Router: Router
+  ReactDOM: ReactDOM
+  findDOMNode: ReactDOM.findDOMNode
   DefaultRoute: Router.DefaultRoute
   Link: Router.Link
   Route: Router.Route

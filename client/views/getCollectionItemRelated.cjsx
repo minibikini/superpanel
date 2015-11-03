@@ -1,4 +1,4 @@
-{React, Router, Spinner, request, _, moment, Link, config, formatters} = require '../toolbelt'
+{React, Router, Spinner, request, _, moment, Link, config, formatters, findDOMNode} = require '../toolbelt'
 {titleize, underscore, capitalize} = require 'inflecto'
 
 Table = require 'react-simple-table'
@@ -150,7 +150,7 @@ module.exports = (schema, relation) ->
       />
 
     componentDidUpdate: ->
-      if $table = React.findDOMNode(@refs.table)
+      if $table = findDOMNode(@refs.table)
         {offsetHeight, offsetWidth} = $table
         offsetHeight = 100 if offsetHeight < 100
         @tableSize =
