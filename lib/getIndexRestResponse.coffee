@@ -12,7 +12,7 @@ getRelationTable = (relName) ->
 
 allowedFilterOperators = ['match', 'eq', 'ne', 'gt', 'ge', 'lt', 'le']
 
-enforceType = (schema, key, value) ->
+enforceType = (schema, key, value, op) ->
   switch schema.get("items.properties.#{key}.type")
     when 'number' then value *= 1
     when 'string' then value += ''
@@ -47,6 +47,10 @@ module.exports = (schema, query) ->
     for key, opVal of filter
       for op, val of opVal
         throw code: 'invalid_filter' unless op in allowedFilterOperators
+        if op is 'match' and schema.get("items.properties.#{key}.type") is 'number'
+          op = 'eq'
+          val = val[5..]
+
         filterChain = filterChain.and r.row(key)[op](enforceType schema, key, val)
 
     dbQuery = dbQuery.filter filterChain
