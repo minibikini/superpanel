@@ -1,6 +1,6 @@
 request = require './request'
 
-# require('../scss/app.scss')
+require('../scss/app.scss')
 
 request('/api/_config').then (config) ->
   window?._config = config
