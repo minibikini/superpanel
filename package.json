@@ -67,7 +67,7 @@
     "react-dom": "^0.14.1",
     "react-hot-loader": "^1.2.8",
     "react-pager": "minibikini/pager",
-    "react-router": "rackt/react-router#01dd54f5d114dddf022206502cedb96f370222a4",
+    "react-router": "^0.13.5",
     "react-simple-table": "^0.6.0",
     "require-directory": "^2.1.1",
     "rethinkdbdash": "^2.0.10",
