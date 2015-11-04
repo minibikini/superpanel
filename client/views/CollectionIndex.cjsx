@@ -118,6 +118,7 @@ module.exports = (schema) ->
           #  link to filter
           if f.link and f.link.type is 'filter'
             f.link.to ?= @context.router.getCurrentPathname()
+            f.link.displayLabelPath ?= f._path
 
             getLinkText = (row, path) =>
               if formatter
@@ -127,10 +128,11 @@ module.exports = (schema) ->
 
             f.function = (row) =>
               filter = _.defaults {}, f.link.filter, value: _.get(row, f._path)
+
               if f.link.to is @context.router.getCurrentPathname()
-                <Link to={f.link.to} onClick={@updateFilter.bind(@, filter)} query={{filter}}>{getLinkText(row, f._path)}</Link>
+                <Link to={f.link.to} onClick={@updateFilter.bind(@, filter)} query={{filter}}>{getLinkText(row, f.link.displayLabelPath)}</Link>
               else
-                <Link to={f.link.to} query={{filter}}>{getLinkText(row, f._path)}</Link>
+                <Link to={f.link.to} query={{filter}}>{getLinkText(row, f.link.displayLabelPath)}</Link>
 
           delete f.path if f.function?
           f

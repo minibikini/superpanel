@@ -20,6 +20,11 @@ enforceType = (schema, key, value, op) ->
       value = value not in ['false', '0', 'no', 'off', 'undefined', 'null', undefined]
     else value
 
+getRqlFields = (key) ->
+  key = key.split '.'
+  res = r.row key[0]
+  res = res(k) for k in key[1..]
+  res
 
 module.exports = (schema, query) ->
   $table = r.table schema.getTableName()
@@ -51,7 +56,7 @@ module.exports = (schema, query) ->
           op = 'eq'
           val = val[5..]
 
-        filterChain = filterChain.and r.row(key)[op](enforceType schema, key, val)
+        filterChain = filterChain.and getRqlFields(key)[op](enforceType schema, key, val)
 
     dbQuery = dbQuery.filter filterChain
 
