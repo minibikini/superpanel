@@ -74,6 +74,7 @@ devConfig =
     "#{publicJsPath}/bundle.js": ['webpack', 'sourcemap']
 
   plugins: [
+    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)
     new webpack.HotModuleReplacementPlugin()
     new webpack.NoErrorsPlugin()
     new webpack.IgnorePlugin(/vertx/)
@@ -88,6 +89,7 @@ prodConfig =
   debug: no
 
   plugins: [
+    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)
     new ExtractTextPlugin("bundle.css")
     new webpack.NoErrorsPlugin()
     new webpack.IgnorePlugin(/vertx/)
