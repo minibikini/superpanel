@@ -1,7 +1,7 @@
 {
   "name": "superpanel",
-  "version": "1.1.2",
-  "description": "Work In Progress",
+  "version": "1.2.0",
+  "description": "A restful backend for RethinkDb with a powerful admin UI. Work In Progress",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
