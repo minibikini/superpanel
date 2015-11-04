@@ -3,15 +3,9 @@
 {camelize, titleize, underscore, capitalize} = require 'inflecto'
 {Icon} = F
 {serialize} = require '../../lib/jsonApi'
-{RenderForm} = forms = require 'newforms'
 
-getForm = (fieldsSchema) ->
-  out = {}
-  for key, {type, opts} of fieldsSchema
-    out[key] = forms[capitalize(type) + 'Field'](opts)
-
-  forms.Form.extend out
-  #   id: forms.CharField(maxLength: 100, label: 'Code')
+{Form} = require('formsy-react')
+{Select, Input} = require 'formsy-react-components'
 
 module.exports = (schema) ->
   React.createClass
@@ -22,17 +16,10 @@ module.exports = (schema) ->
     getInitialState: ->
       isLoading: no
 
-    onSubmit: (e) ->
-      e.preventDefault()
-
-      form = @refs.form.getForm()
-      if form.validate()
-        @setState isLoading: yes
-        request.post(@schema.getUrl(), data: serialize(form.cleanedData, @schema)).then (reply) =>
-          @transitionTo @schema.getRouteName('Show'), id: reply.data?.id
-
-    getForm: ->
-      getForm @schema.get 'views.create.fields'
+    onSubmit: (data) ->
+      @setState isLoading: yes
+      request.post(@schema.getUrl(), data: serialize(data, @schema)).then (reply) =>
+        @transitionTo @schema.getRouteName('Show'), id: reply.data?.id
 
     getTitle: ->
       if displayName = @schema.get('views.create.displayName')
@@ -45,14 +32,17 @@ module.exports = (schema) ->
     getSubmitButtonTitle: ->
       @schema.get('views.create.submitButtonTitle') or "Create " + @getTitle()
 
+    getInputs: ->
+      for key, {type, opts} of @schema.get 'views.create.fields'
+        <Input key={key} name={key} type={type} label={opts.label or titleize underscore key} value={opts.initial}/>
+
     render: ->
-      # console.log @getPath(), @getPathname(), @getParams()
       return <Spinner /> if @state.isLoading
 
       <div>
         <h2>{@getTitle()}</h2>
-        <form onSubmit={@onSubmit}>
-          <RenderForm form={@getForm()} ref="form"/>
+        <Form onSubmit={@onSubmit}>
+          {@getInputs()}
           <button className="button" type="submit"> <Icon name="plus"/> {@getSubmitButtonTitle()}</button>
-        </form>
+        </Form>
       </div>
