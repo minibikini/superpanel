@@ -4,7 +4,7 @@ defaultConfig = require __dirname + "/../config/config"
 # _ = require 'lodash'
 Promise = require 'bluebird'
 glob = require 'glob'
-# fs = Promise.promisifyAll require 'fs'
+fs = Promise.promisifyAll require 'fs'
 logger = require './logger'
 
 
@@ -64,7 +64,6 @@ runServer = ->
       server schema, controllers
       # logger.debug schema
 
-
 if program.build or program.watch
   webpack = require("webpack")
   compiler = webpack require("../webpack.config")
@@ -76,6 +75,11 @@ if program.build or program.watch
       logger.error err if err?
       logger.debug stats.toString(colors: true)
       logger.info "Build done in #{Date.now() - buildBeginAt} ms"
+
+      if program.saveBuildStats
+        fs.writeFile "#{projectRoot}/superpanel-bundle-stats.json", JSON.stringify(stats.toJson()), (err) ->
+          return logger.erorr err if err
+          logger.info "Saved build stats to #{projectRoot}/superpanel-bundle-stats.json"
 
   if program.watch
     logger.info "Watch changes and rebuild the browser app"
