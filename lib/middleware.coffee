@@ -4,6 +4,7 @@ _ = require 'lodash'
 # User = require './models/User'
 logger = require './logger'
 {copyObject} = require './helpers'
+{buildDirName} = require '../config/system-names'
 
 isDev = process.env.NODE_ENV isnt 'production'
 
@@ -66,14 +67,14 @@ module.exports =
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Superpanel</title>
-        <link rel="stylesheet" href="/build/bundle.css">
+        <link rel="stylesheet" href="/#{buildDirName}/bundle.css">
     </head>
     <body>
     """
     # @body += '   <script src="/webpack-dev-server.js"></script>' if isDev
     @body += """
       <div id="superpanel-app-container" />
-      <script src="/build/bundle.js"> </script>
+      <script src="/#{buildDirName}/bundle.js"> </script>
     </body>
     </html>
     """

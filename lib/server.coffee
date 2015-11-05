@@ -2,7 +2,7 @@ startedAt = Date.now()
 
 logger = require './logger'
 ResourceSchema = require './ResourceSchema'
-
+{buildDirName} = require '../config/system-names'
 process.on 'uncaughtException', (err) ->
   logger.error 'uncaughtException', err
 
@@ -14,7 +14,7 @@ Router = require('koa-router')
 
 {setupContext, responseTime, staticFolder, errorHandler, serveIndex} = require './middleware'
 
-module.exports = (resources, controllers) ->
+module.exports = (resources, controllers, projectRoot) ->
   config = require '../config/config'
 
   app = require('koa')()
@@ -28,6 +28,7 @@ module.exports = (resources, controllers) ->
   app.use require('koa-cors')()
   app.use compress() if app.isProd
   # app.use require('koa-favicon')(__dirname + '/../public/favicon.ico')
+  app.use require('koa-static')(projectRoot + '/public')
   app.use require('koa-static')(__dirname + '/../public')
   # app.use mount '/st', staticFolder
 

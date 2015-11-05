@@ -5,10 +5,12 @@ ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 isProd = process.env.NODE_ENV is 'production'
 
-publicJsPath = path.join(__dirname, "public/build")
+{buildDirName} = require './config/system-names'
 {projectRoot} = require './lib/cli.js'
+
 customViewsPath = path.resolve projectRoot, './client'
 customResourcesPath = path.resolve projectRoot, './resources'
+publicBuildPath = path.resolve projectRoot, "public/#{buildDirName}"
 
 definePlugin = new webpack.DefinePlugin
   __DEV__: JSON.stringify(JSON.parse(process.env.BUILD_DEV || 'true')),
@@ -22,7 +24,7 @@ for dir in ["foundation-apps/scss/", "font-awesome/scss/"]
 
 commonConfig =
   output:
-    path: publicJsPath
+    path: publicBuildPath
     filename: 'bundle.js'
     publicPath: '/build/'
 
@@ -71,7 +73,7 @@ devConfig =
   devtool: "eval"
   debug: true
   preprocessors:
-    "#{publicJsPath}/bundle.js": ['webpack', 'sourcemap']
+    "#{publicBuildPath}/bundle.js": ['webpack', 'sourcemap']
 
   plugins: [
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)

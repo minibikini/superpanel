@@ -1,12 +1,10 @@
 pkg = require __dirname + "/../package"
 defaultConfig = require __dirname + "/../config/config"
 
-# _ = require 'lodash'
 Promise = require 'bluebird'
 glob = require 'glob'
 fs = Promise.promisifyAll require 'fs'
 logger = require './logger'
-
 
 {projectRoot, program} = require './cli.js'
 
@@ -61,7 +59,7 @@ runServer = ->
       controllers: getControllers resources
     .then ({schema, controllers}) ->
       logger.debug "Loaded schema in #{Date.now() - begin} ms"
-      server schema, controllers
+      server schema, controllers, projectRoot
       # logger.debug schema
 
 if program.build or program.watch
