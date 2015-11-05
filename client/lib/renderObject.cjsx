@@ -5,11 +5,23 @@ module.exports = renderObject = (schema, obj, propName) ->
   output = []
 
   rows = for key, value of obj when not _.isObject(value) and not _.isArray(value)
-    displayName = _.get schema, "properties.#{key}.displayName"
-    name = displayName or titleizeKey key
-    <tr key={key}><td><strong>{name}</strong></td><td>{value}</td></tr>
+    do (key, value) ->
+      if fieldOpts = _.get schema, "properties.#{key}"
+        {displayName, type} = fieldOpts
 
-  output.push <h2>{schema?.displayName or titleizeKey propName}</h2>
+      name = displayName or titleizeKey key
+
+      value = if value? and value isnt ''
+        switch type
+          when 'boolean'
+            if value then <span className="boolean-value-true">&#10004;</span> else <span>&#10060;</span>
+          else value
+      else 'N/A'
+
+
+      <tr key={key}><td><strong>{name}</strong></td><td>{value}</td></tr>
+
+  output.push <h2 key="header">{schema?.displayName or titleizeKey propName}</h2>
 
   output.push <table key={Math.random()} className="horizontal striped">
     <tbody>
