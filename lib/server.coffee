@@ -4,13 +4,10 @@ logger = require './logger'
 ResourceSchema = require './ResourceSchema'
 {buildDirName} = require '../config/system-names'
 process.on 'uncaughtException', (err) ->
-  logger.error 'uncaughtException', err
-
+  logger.error err
 mount = require 'koa-mount'
 compress = require 'koa-compress'
 Router = require('koa-router')
-
-
 
 {setupContext, responseTime, staticFolder, errorHandler, serveIndex} = require './middleware'
 
