@@ -17,7 +17,6 @@ runServer = ->
         return reject err if err
         resolve (folder[...-1] for folder in data)
 
-
   getSchema = (path) ->
     new Promise (resolve, reject) ->
       glob "**/*", cwd: "#{projectRoot}/resources/#{path}" , (err, data) ->
