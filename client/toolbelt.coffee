@@ -2,6 +2,8 @@ Router = require('react-router')
 React = require 'react'
 ReactDOM = require('react-dom')
 
+magicRequire = require './lib/magicRequire'
+
 belt =
   React: React
   Router: Router
@@ -18,14 +20,9 @@ belt =
   cx: require 'classnames'
   moment: require 'moment'
   Spinner: require './components/Spinner'
-  # Loading: require './views/Loading'
-  # errorMessages: require './lib/errorMessages'
-  # ContentPage: require './components/ContentPage'
   F: require './components/F'
   helpers: require '../lib/helpers'
-  formatters: require '../lib/formatters'
-  # cdnUrl: require '../../lib/cdnUrl'
-  # PageMixin: require './mixins/PageMixin'
-  magicRequire: require './lib/magicRequire'
+  formatters: magicRequire.withDefaults './lib/formatters'
+  magicRequire: magicRequire
 
 module.exports = belt
