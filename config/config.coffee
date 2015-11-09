@@ -12,12 +12,10 @@ module.exports = _.defaults config,
   name: 'superpanel'
   timezone: '+07:00'
   currency: 'USD'
-
-  web:
-    port: 1337
+  port: 1337
 
   rethinkdb:
-    db: 'mobiletopup'
+    db: 'superpanel'
 
   # api:
   #   showLinks: yes
