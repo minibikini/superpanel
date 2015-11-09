@@ -1,4 +1,6 @@
 startedAt = Date.now()
+Promise = require 'bluebird'
+Promise.config warnings: off
 
 logger = require './logger'
 ResourceSchema = require './ResourceSchema'
