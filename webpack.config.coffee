@@ -38,10 +38,10 @@ commonConfig =
     loaders: [
       { test: /\.css$/, loaders: ['style', 'css']},
       { test: /\.scss$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader?#{sassOpts}")},
-      { test: /\.cjsx$/, loaders: ['react-hot', 'coffee', 'cjsx']},
-      { test: /\.jsx$/, loaders: ['react-hot', 'babel']},
+      { test: /\.cjsx$/, loaders: ['coffee', 'cjsx']},
+      { test: /\.jsx$/, loaders: ['babel']},
       { test: /\.json$/, loader: 'json'}
-      { test: /\.coffee$/, loaders: ['react-hot', 'coffee'] }
+      { test: /\.coffee$/, loaders: ['coffee'] }
       # { test: /\.cjsx$/, loaders: ['coffee', 'cjsx']},
       # { test: /\.jsx$/, loaders: ['babel']},
       # { test: /\.coffee$/, loaders: ['coffee'] },
@@ -77,7 +77,6 @@ devConfig =
 
   plugins: [
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)
-    new webpack.HotModuleReplacementPlugin()
     new webpack.NoErrorsPlugin()
     new webpack.IgnorePlugin(/vertx/)
     new ExtractTextPlugin("bundle.css")
