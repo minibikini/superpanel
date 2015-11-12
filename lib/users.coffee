@@ -49,4 +49,7 @@ create = (data) ->
 updatePassword = (id, password) ->
   get(id).update hashPassword password
 
-module.exports = {get, getByUsername, validatePassword, getByEmail, create, updatePassword}
+updateLastLoginAt = (id) ->
+  get(id).update lastLoginAt: r.now()
+
+module.exports = {get, getByUsername, validatePassword, getByEmail, create, updatePassword, updateLastLoginAt}
