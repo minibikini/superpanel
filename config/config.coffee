@@ -8,7 +8,7 @@ catch e
     config = {}
   else throw e
 
-module.exports = _.defaults config,
+module.exports = _.defaultsDeep config,
   name: 'superpanel'
   timezone: '+07:00'
   currency: 'USD'
