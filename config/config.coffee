@@ -19,3 +19,10 @@ module.exports = _.defaultsDeep config,
 
   # api:
   #   showLinks: yes
+
+  auth:
+    isOpenSignup: no
+    local:
+      usernameField: 'email'
+      isEmailRequried: yes
+      isEmailConfirmationRequired: yes

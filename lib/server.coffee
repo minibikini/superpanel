@@ -10,6 +10,7 @@ process.on 'uncaughtException', (err) ->
 mount = require 'koa-mount'
 compress = require 'koa-compress'
 Router = require('koa-router')
+passport = require('koa-passport')
 
 {setupContext, responseTime, staticFolder, errorHandler, serveIndex} = require './middleware'
 
@@ -42,15 +43,20 @@ module.exports = (resources, controllers, projectRoot) ->
   app.use require('koa-etag')()
 
   # TODO: remove global parser; make parsing inside route
-  # app.use require('koa-body')()
-  # app.use require('koa-overwrite')()
-  # app.use passport.initialize()
-  # app.use passport.session()
+  app.use require('koa-body')()
 
-  # app.use setupContext
+  # parses the hidden _method field in forms to emit RESTful routing with HTML Forms.
+  app.use require('koa-overwrite')()
+
+  # auth
+  app.use passport.initialize()
+  app.use passport.session()
+
+  app.use setupContext
   app.use require('koa-json')(pretty: no, param: 'pretty')
 
   router = new Router()
+  require('./auth')(router)
   router.get '/', serveIndex
   app.use router.routes()
 

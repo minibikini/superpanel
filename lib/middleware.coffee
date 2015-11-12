@@ -5,6 +5,7 @@ _ = require 'lodash'
 logger = require './logger'
 {copyObject} = require './helpers'
 {buildDirName} = require '../config/system-names'
+config = require '../config/config'
 
 isDev = process.env.NODE_ENV isnt 'production'
 
@@ -17,9 +18,7 @@ module.exports =
 
 
   setupContext: (next) ->
-    if @passport?.user
-      @user = @state.user = @passport.user
-
+    @user = @passport.user if @passport?.user
     yield next
 
   responseTime: (next) ->
@@ -70,11 +69,12 @@ module.exports =
         <link rel="stylesheet" href="/#{buildDirName}/bundle.css">
     </head>
     <body>
-    """
-    # @body += '   <script src="/webpack-dev-server.js"></script>' if isDev
-    @body += """
       <div id="superpanel-app-container" />
-      <script src="/#{buildDirName}/bundle.js"> </script>
+      <script>
+        var _superpanel_user = #{JSON.stringify @user};
+        var _superpanel_usernameField = #{JSON.stringify config.auth.local.usernameField};
+      </script>
+      <script src="/#{buildDirName}/bundle.js"></script>
     </body>
     </html>
     """
