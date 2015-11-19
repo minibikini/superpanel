@@ -57,7 +57,9 @@ module.exports = (resources, controllers, projectRoot) ->
 
   router = new Router()
   require('./auth')(router)
-  router.get '/', serveIndex
+  if config.uiUrl
+    router.get config.uiUrl, serveIndex
+
   app.use router.routes()
 
   app.use mount '/api/_config', ->

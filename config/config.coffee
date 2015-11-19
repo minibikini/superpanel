@@ -20,6 +20,8 @@ module.exports = _.defaultsDeep config,
   # api:
   #   showLinks: yes
 
+  uiUrl: '/area51'
+
   auth:
     isOpenSignup: no
     local:
