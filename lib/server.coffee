@@ -12,7 +12,7 @@ compress = require 'koa-compress'
 Router = require('koa-router')
 passport = require('koa-passport')
 
-{setupContext, responseTime, staticFolder, errorHandler, serveIndex} = require './middleware'
+{authentication, setupContext, responseTime, staticFolder, errorHandler, serveIndex} = require './middleware'
 
 module.exports = (resources, controllers, projectRoot) ->
   config = require '../config/config'
@@ -20,8 +20,7 @@ module.exports = (resources, controllers, projectRoot) ->
   app = require('koa')()
   app.isProd = app.env is 'production'
   app.name = config.name
-  # app.keys = ['GkgwaQi4546', 'LHGsfDs3dK1', 'PjhFf45d876', 'mhUE$5TYGJyrt', 'K@7g%0Hfb2']
-
+  app.keys = config.sessionKeys
   require('koa-qs')(app)
   app.use errorHandler
   app.use responseTime
@@ -37,7 +36,7 @@ module.exports = (resources, controllers, projectRoot) ->
     # koaLogger = require('koa-bunyan')
     # app.use koaLogger logger, timeLimit: 1000
 
-  # app.use require('koa-session')({key: 'se', maxage: 1000 * 3600 * 24 * 30}, app)
+  app.use require('koa-session')({key: '_sp', maxage: 1000 * 3600 * 24 * 30}, app)
 
   app.use require('koa-conditional-get')()
   app.use require('koa-etag')()
@@ -54,6 +53,8 @@ module.exports = (resources, controllers, projectRoot) ->
 
   app.use setupContext
   app.use require('koa-json')(pretty: no, param: 'pretty')
+
+  app.use authentication
 
   router = new Router()
   require('./auth')(router)

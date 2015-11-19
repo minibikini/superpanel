@@ -14,4 +14,9 @@ module.exports = React.createClass
     <ul className="menu-bar icon-left primary condense vertical">
       <li><Link to='/'>Dashboard</Link></li>
       {collectionLinks}
+      <li><hr /></li>
+      <li><a href="/logout">Logout</a></li>
     </ul>
+
+
+

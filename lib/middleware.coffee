@@ -6,10 +6,13 @@ logger = require './logger'
 {copyObject} = require './helpers'
 {buildDirName} = require '../config/system-names'
 config = require '../config/config'
+{AuthenticationError} = require('koa-police')
 
 isDev = process.env.NODE_ENV isnt 'production'
 
 module.exports =
+  authentication: require('./getAuthenticationMiddleware')
+
   ensureAuthenticated: (next) ->
     if @isAuthenticated()
       yield next
@@ -41,6 +44,9 @@ module.exports =
     try
       yield next
     catch error
+      if error instanceof AuthenticationError
+        @throw 403
+
       requestBody = @request.body
       _.merge error, {remoteIp: @ip, @request, requestBody, refs: userId: @user?.id}
       error.code = 'not_found' if error.status is 404 and not error.code

@@ -8,7 +8,12 @@ catch e
     config = {}
   else throw e
 
-module.exports = _.defaultsDeep config,
+
+getRandomSessionKeys = ->
+  for i in [1..5]
+    _.random(1000000000000000, 9999999999999999).toString(36)
+
+config = _.defaultsDeep config,
   name: 'superpanel'
   timezone: '+07:00'
   currency: 'USD'
@@ -20,7 +25,7 @@ module.exports = _.defaultsDeep config,
   # api:
   #   showLinks: yes
 
-  uiUrl: '/area51'
+  uiUrl: '/'
 
   auth:
     isOpenSignup: no
@@ -28,3 +33,9 @@ module.exports = _.defaultsDeep config,
       usernameField: 'email'
       isEmailRequried: yes
       isEmailConfirmationRequired: yes
+
+
+
+config.sessionKeys ?= getRandomSessionKeys()
+
+module.exports = config
