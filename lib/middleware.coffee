@@ -16,7 +16,6 @@ module.exports =
     else
       @throw 403
 
-
   setupContext: (next) ->
     @user = @passport.user if @passport?.user
     yield next

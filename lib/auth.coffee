@@ -16,7 +16,7 @@ module.exports = (rootRouter)->
       cb "Something went wrong. Please, try again."
 
   passport.deserializeUser (id, cb) ->
-    users.get(id).nodeify cb
+    users.get(id).asCallback cb
 
   localOpts =
     usernameField: config.auth.local.usernameField
@@ -38,7 +38,8 @@ module.exports = (rootRouter)->
           done null, false, message: 'Incorrect password', code: 'bad_password'
 
   rootRouter.get '/logout', ->
-    yield @logout()
+    yield []
+    @logout()
     @redirect('/')
 
   router = require('koa-router')

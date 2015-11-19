@@ -29,7 +29,8 @@ validatePassword = (user, password) ->
   hashed = hashPassword(password, user.solt)
   hashed.password is user.password
 
-get = (id) -> $table.get id
+get = (id) ->
+  $table.get(id).run()
 
 getBy = (key, index) ->
   $table.getAll(key, {index}).then ([record]) -> record
@@ -50,6 +51,6 @@ updatePassword = (id, password) ->
   get(id).update hashPassword password
 
 updateLastLoginAt = (id) ->
-  get(id).update lastLoginAt: r.now()
+  $table.get(id).update(lastLoginAt: r.now()).run()
 
 module.exports = {get, getByUsername, validatePassword, getByEmail, create, updatePassword, updateLastLoginAt}
