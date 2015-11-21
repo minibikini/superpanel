@@ -10,13 +10,18 @@ customResources = customResourceRequire.keys()
 magicRequire = (name, type = "common", alt) ->
   if type is 'common' and name in customCommons
     return customCommonRequire name
+
   if type is 'resource' and name in customResources
     return customResourceRequire name
 
-  if alt
-    alt
-  else
-    require '../' + name
+  alt or require '../' + name
+
+magicRequire.mayBe = (name, type = "common") ->
+  if type is 'common' and name in customCommons
+    customCommonRequire name
+
+  if type is 'resource' and name in customResources
+    customResourceRequire name
 
 magicRequire.withDefaults = (name) ->
   defaultObject = require '../' + name[2..]
