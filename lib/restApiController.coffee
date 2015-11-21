@@ -9,13 +9,12 @@ showLinks = _.get require('../config/config'), 'api.showLinks'
 
 module.exports = (schema) ->
   router = Router()
-
   $table = r.table schema.getTableName()
 
   updateItem = ->
     {data, included} = @request.body
     update = deserialize data, schema, included
-    result = yield $table.get(@params.id).update update, returnChanges: yes
+    result = yield $table.get(@params.id).update(update, returnChanges: yes).run()
     @body = data: serialize _.get(result, 'changes[0].new_val'), schema
 
   router.param 'id', (id, next) ->

@@ -41,9 +41,6 @@ module.exports = (resources, controllers, projectRoot) ->
   app.use require('koa-conditional-get')()
   app.use require('koa-etag')()
 
-  # TODO: remove global parser; make parsing inside route
-  app.use require('koa-body')()
-
   # parses the hidden _method field in forms to emit RESTful routing with HTML Forms.
   app.use require('koa-overwrite')()
 
