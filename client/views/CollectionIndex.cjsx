@@ -8,8 +8,12 @@ CollectionIndexPager = require '../components/CollectionIndexPager'
 {Icon} = F
 Table = require 'react-simple-table'
 
-formatDate = (path, format = 'lll') -> (row) ->
-  moment(_.get row, path).format format
+FiltersForm = ({filter, schema, onChange, onReset}) ->
+  return <div /> unless (collectionFields = schema.getFields()).length
+  <div className="filters">
+    <CollectionIndexFilterForm filter={filter} schema={schema} onChange={onChange} />
+    <button className="button" onClick={onReset}>Reset</button>
+  </div>
 
 module.exports = (schema) ->
   React.createClass
@@ -91,14 +95,14 @@ module.exports = (schema) ->
             if fieldSchema.displayName
               f.displayName = fieldSchema.displayName
 
-            f.function ?= switch fieldSchema.format
-              when 'datetime' then formatDate f.path, fieldSchema.dateFormat or 'lll'
-              when 'date' then formatDate f.path, fieldSchema.dateFormat or 'll'
-              else undefined
-
           formatter = f.formatter or @schema.getFormatter f.path
           if formatter
             f.function = (row) => formatters.get(formatter)(@schema, row, f)
+          else
+            if fieldSchema?.type is 'datetime'
+              f.function = (row) =>
+                f.displayFormat = fieldSchema.displayFormat
+                formatters.get('date')(@schema, row, f)
 
           if f.link and f.link.type is 'relation' and rel = @schema.getRelation f.link.to
             [to, idPath] = switch rel.type
@@ -192,9 +196,7 @@ module.exports = (schema) ->
         </div>
         <div className="list-controls clearfix">
           <div className="float-right">Found: {@state.meta?.total or 0} Items</div>
-          <div className="filters">
-            <CollectionIndexFilterForm filter={@state.filter} schema={@schema} onChange={@handleFilterChange} />
-            <button className="button" onClick={@resetFilter}>Reset</button></div>
+          <FiltersForm filter={@state.filter} schema={@schema} onChange={@handleFilterChange} onReset={@resetFilter} />
         </div>
 
         {content}

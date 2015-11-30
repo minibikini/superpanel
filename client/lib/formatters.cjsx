@@ -1,4 +1,5 @@
 _ = require 'lodash'
+moment = require 'moment'
 # config = require '../config/config'
 # {Link} = require 'react-router'
 
@@ -33,3 +34,8 @@ module.exports =
   money: (schema, row, opts) ->
     path = opts.path or opts._path
     "#{_.get row, path} #{getCurrencySymbol opts.currency}"
+
+  date: (schema, row, opts) ->
+    path = opts.path or opts._path
+    displayFormat = opts.displayFormat or 'lll'
+    moment(_.get(row, path)).format(displayFormat)

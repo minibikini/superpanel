@@ -1,6 +1,7 @@
 _ = require 'lodash'
 {titleizeKey} = require '../../lib/helpers'
 moment = require 'moment'
+typeOf = require 'typeof'
 
 module.exports = renderObject = (schema, obj, propName) ->
   output = []
@@ -10,16 +11,20 @@ module.exports = renderObject = (schema, obj, propName) ->
       if fieldOpts = _.get schema, "properties.#{key}"
         {displayName, type, formatter} = fieldOpts
 
+      type ?= typeOf value
       name = displayName or titleizeKey key
 
       value = switch type
         when 'string'
-          if _.isEmpty(value) then 'N/A' else value
+          if _.isEmpty(value) then <span style={color:'#666'}>N/A</span> else value
         when 'boolean'
           if value then <span className="boolean-value-true">&#10004;</span> else <span>&#10060;</span>
         when 'datetime'
-          moment(value).format('llll')
-        else value
+          moment(value).format fieldOpts.displayFormat or 'llll'
+        when 'null'
+          <span style={color:'#666'}>null</span>
+        else
+          value
 
       <tr key={key}><td><strong>{name}</strong></td><td>{value}</td></tr>
 

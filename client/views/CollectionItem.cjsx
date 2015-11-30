@@ -1,14 +1,11 @@
 {React, Router, Spinner, request, _, moment, helpers, Link, magicRequire} = require '../toolbelt'
 
-EmptyDiv = require '../components/EmptyDiv'
-
-formatDate = (path) -> (row) ->
-  moment(_.get row, path).format('lll')
+EmptyDiv = -> <div />
 
 renderObject = require '../lib/renderObject'
 
 module.exports = (schema) ->
-  CollectionItemTop = magicRequire.mayBe "./#{schema.getTableName()}/views/CollectionItemTop", 'resource', EmptyDiv
+  CollectionItemTop = (magicRequire.mayBe "./#{schema.getTableName()}/views/CollectionItemTop", 'resource') or EmptyDiv
 
   React.createClass
     mixins: [ Router.State ]
