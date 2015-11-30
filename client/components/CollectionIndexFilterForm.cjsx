@@ -14,7 +14,7 @@ opFields = [
 ]
 
 module.exports = CollectionIndexFilterForm = ({filter, schema, onChange}) ->
-  collectionFields = schema.getFields()
+  return <div /> unless (collectionFields = schema.getFields()).length
 
   handleChange = (filter) ->
     if _.isPlainObject(filter)
