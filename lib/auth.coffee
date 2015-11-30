@@ -6,8 +6,6 @@ logger = require './logger'
 Promise = require 'bluebird'
 
 module.exports = (rootRouter)->
-  require('koa-router')
-
   passport.serializeUser (user, cb) ->
     if user and user.id
       cb null, user.id
@@ -49,7 +47,7 @@ module.exports = (rootRouter)->
     yield @logout() if @user
     @body = success: yes
 
-  router.post '/login', (next) ->
+  router.post '/login', require('koa-body')(), (next) ->
     loginCb = (err, user, info) =>
       @throw 400, err if err
       @throw 401, info unless user
@@ -59,7 +57,7 @@ module.exports = (rootRouter)->
 
       @body = {user}
 
-    yield passport.authenticate('local', loginCb).call(this, next)
+    yield passport.authenticate('local', loginCb).call(@, next)
 
 
   rootRouter.use router.routes()
