@@ -1,5 +1,6 @@
 _ = require 'lodash'
 {titleizeKey} = require '../../lib/helpers'
+moment = require 'moment'
 
 module.exports = renderObject = (schema, obj, propName) ->
   output = []
@@ -7,17 +8,18 @@ module.exports = renderObject = (schema, obj, propName) ->
   rows = for key, value of obj when not _.isObject(value) and not _.isArray(value)
     do (key, value) ->
       if fieldOpts = _.get schema, "properties.#{key}"
-        {displayName, type} = fieldOpts
+        {displayName, type, formatter} = fieldOpts
 
       name = displayName or titleizeKey key
 
-      value = if value? and value isnt ''
-        switch type
-          when 'boolean'
-            if value then <span className="boolean-value-true">&#10004;</span> else <span>&#10060;</span>
-          else value
-      else 'N/A'
-
+      value = switch type
+        when 'string'
+          if _.isEmpty(value) then 'N/A' else value
+        when 'boolean'
+          if value then <span className="boolean-value-true">&#10004;</span> else <span>&#10060;</span>
+        when 'datetime'
+          moment(value).format('llll')
+        else value
 
       <tr key={key}><td><strong>{name}</strong></td><td>{value}</td></tr>
 
