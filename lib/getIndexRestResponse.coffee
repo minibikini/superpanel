@@ -40,11 +40,11 @@ module.exports = (schema, query) ->
   if index and indexValue
     dbQuery = dbQuery.getAll indexValue, {index}
 
-  unless sort
+  if not sort? and softField = schema.getDefaultOrderBy()
     if not indexValue
-      dbQuery = dbQuery.orderBy index: r.desc 'createdAt'
+      dbQuery = dbQuery.orderBy index: r.desc softField
     else
-      sort = '-createdAt'
+      sort = '-' + softField
 
   if filter
     filterChain = r.expr(1).eq(1)

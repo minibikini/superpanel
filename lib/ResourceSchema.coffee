@@ -88,3 +88,7 @@ module.exports = class ResourceSchema
       for key, {displayName} of props
         value: key, label: displayName or titleize underscore key
     else []
+
+  getDefaultOrderBy: ->
+    defaultOrderBy = @get('defaultOrderBy')
+    if defaultOrderBy? then defaultOrderBy else 'createdAt'
