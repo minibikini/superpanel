@@ -39,3 +39,13 @@ module.exports =
     path = opts.path or opts._path
     displayFormat = opts.displayFormat or 'lll'
     moment(_.get(row, path)).format(displayFormat)
+
+  pre: (schema, row, opts) ->
+    path = opts.path or opts._path
+
+    value = if path
+      _.get row, opts._path
+    else
+      row
+
+    <pre>{value}</pre>
