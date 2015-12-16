@@ -1,6 +1,6 @@
 typeOf = require 'typeof'
 
-{_, moment, formatters} = require '../toolbelt'
+{_, moment, formatters, Link} = require '../toolbelt'
 {titleizeKey} = require '../../lib/helpers'
 
 module.exports = renderObject = (schema, obj, propName) ->
@@ -14,7 +14,7 @@ module.exports = renderObject = (schema, obj, propName) ->
       displayName ?= titleizeKey key
       type ?= typeOf value
 
-      value = if formatter
+      formatted = if formatter
         formatters.get(formatter)(schema, value, fieldOpts)
       else
         switch type
@@ -29,7 +29,11 @@ module.exports = renderObject = (schema, obj, propName) ->
           else
             value
 
-      <tr key={key}><td><strong>{displayName}</strong></td><td>{value}</td></tr>
+      if fieldOpts?.collectionLink
+        to = "resource#{fieldOpts.collectionLink}Show"
+        formatted = <Link to={to} params={{id: value}}>{formatted}</Link>
+
+      <tr key={key}><td><strong>{displayName}</strong></td><td>{formatted}</td></tr>
 
   output.push <h2 key="header">{schema?.displayName or titleizeKey propName}</h2>
 
