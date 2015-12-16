@@ -1,7 +1,7 @@
-_ = require 'lodash'
-{titleizeKey} = require '../../lib/helpers'
-moment = require 'moment'
 typeOf = require 'typeof'
+
+{_, moment, formatters} = require '../toolbelt'
+{titleizeKey} = require '../../lib/helpers'
 
 module.exports = renderObject = (schema, obj, propName) ->
   output = []
@@ -11,22 +11,25 @@ module.exports = renderObject = (schema, obj, propName) ->
       if fieldOpts = _.get schema, "properties.#{key}"
         {displayName, type, formatter} = fieldOpts
 
+      displayName ?= titleizeKey key
       type ?= typeOf value
-      name = displayName or titleizeKey key
 
-      value = switch type
-        when 'string'
-          if _.isEmpty(value) then <span style={color:'#666'}>N/A</span> else value
-        when 'boolean'
-          if value then <span className="boolean-value-true">&#10004;</span> else <span>&#10060;</span>
-        when 'datetime'
-          moment(value).format fieldOpts.displayFormat or 'llll'
-        when 'null'
-          <span style={color:'#666'}>null</span>
-        else
-          value
+      value = if formatter
+        formatters.get(formatter)(schema, value, fieldOpts)
+      else
+        switch type
+          when 'string'
+            if _.isEmpty(value) then <span style={color:'#666'}>N/A</span> else value
+          when 'boolean'
+            if value then <span className="boolean-value-true">&#10004;</span> else <span>&#10060;</span>
+          when 'datetime'
+            moment(value).format fieldOpts.displayFormat or 'llll'
+          when 'null'
+            <span style={color:'#666'}>null</span>
+          else
+            value
 
-      <tr key={key}><td><strong>{name}</strong></td><td>{value}</td></tr>
+      <tr key={key}><td><strong>{displayName}</strong></td><td>{value}</td></tr>
 
   output.push <h2 key="header">{schema?.displayName or titleizeKey propName}</h2>
 
