@@ -26,7 +26,7 @@ getRqlFields = (key) ->
   res = res(k) for k in key[1..]
   res
 
-module.exports = (schema, query) ->
+module.exports = (schema, query, rel) ->
   $table = r.table schema.getTableName()
 
   limit = Number query.limit or 20
@@ -34,6 +34,8 @@ module.exports = (schema, query) ->
   offset = Number query.offset or 0
 
   {include, index, indexValue, filter, sort} = query
+
+  indexValue = r.args indexValue if _.isArray indexValue
 
   dbQuery = $table
 

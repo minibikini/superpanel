@@ -10,7 +10,7 @@ class ResourceRelation
     if _.isArray(rel)
       [@type, @resource, @name, @ownKey, @foreignKey, @index] = rel
     else
-      {@type, @resource, @name, @ownKey, @foreignKey, @index} = rel
+      {@type, @resource, @name, @ownKey, @foreignKey, @index, @via, @viaKey} = rel
 
   getSchema: ->
     @_schema or @_schema = new ResourceSchema @_fullSchema, _.find @_fullSchema, path: @resource

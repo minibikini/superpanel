@@ -52,9 +52,15 @@ module.exports = (schema) ->
     switch rel.type
       when 'hasMany'
         router.get "/:id/#{rel.name}", ->
-          @query.index = rel.foreignKey
-          @query.indexValue = @params.id
-          @body = yield getIndexRestResponse rel.getSchema(), @query
+          if rel.via?
+            @query = Object.assign @query,
+              indexValue: yield r.table(rel.via).getAll(@record[rel.ownKey], index: rel.viaKey)(rel.foreignKey)
+              index: rel.getSchema().getPk()
+          else
+            @query.index = rel.foreignKey
+            @query.indexValue = @params.id
+
+          @body = yield getIndexRestResponse rel.getSchema(), @query, rel
 
       when 'belongsTo'
         router.get "/:id/#{rel.name}", ->
