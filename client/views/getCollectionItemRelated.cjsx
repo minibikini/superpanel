@@ -8,8 +8,9 @@ formatDate = (path) -> (row) ->
   moment(_.get row, path).format('lll')
 
 module.exports = (schema, relation) ->
-  relatedViewSchema = schema.get "items.views.related.#{relation.name}"
   relatedSchema = relation.getSchema()
+  relatedViewSchema = schema.get("items.views.related.#{relation.name}") or relatedSchema.get('views.index')
+
 
   React.createClass
     mixins: [ Router.State ]
