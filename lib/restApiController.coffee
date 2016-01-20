@@ -7,6 +7,8 @@ getIndexRestResponse = require './getIndexRestResponse'
 {serialize, deserialize} = require './jsonApi'
 showLinks = _.get require('../config/config'), 'api.showLinks'
 
+{projectRoot, program} = require './cli.js'
+
 module.exports = (schema) ->
   router = Router()
   $table = r.table schema.getTableName()
@@ -74,4 +76,10 @@ module.exports = (schema) ->
             id: @record[rel.ownKey]
 
 
+  try
+    customRoutes = require "#{projectRoot}/resources/#{schema.getName()}/routes"
+    logger.debug "Adding custom methods to `#{schema.getName()}`"
+    customRoutes(router, schema)
+  catch e
+    # do nothing
   router.routes()
