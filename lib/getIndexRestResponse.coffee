@@ -80,10 +80,10 @@ module.exports = (schema, query, rel) ->
         relatedRecords = []
         relatedIds = {}
         include.forEach (relName) ->
-          items = _.compact _.pluck reply.data, ['relationships', relName, 'data']
+          items = _.compact _.map reply.data, "relationships.#{relName}.data"
           relatedRecords.push items if items.length
 
-        relatedRecords = _.unique _.flatten(relatedRecords), (i) -> i.type + i.id
+        relatedRecords = _.uniq _.flatten(relatedRecords), (i) -> i.type + i.id
 
         for relrec in relatedRecords
           relatedIds[relrec.type] ?= []
