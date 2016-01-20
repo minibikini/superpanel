@@ -81,7 +81,8 @@ module.exports = class ResourceSchema
 
   getFormatter: (path) ->
     path = path?.replace(/\./g, ".properties.")
-    @get "items.properties.#{path}.formatter"
+    if prop = @get("items.properties.#{path}")
+      prop.formatter or prop.type
 
   getFields: ->
     if props = @get('items.properties')

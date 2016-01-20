@@ -25,7 +25,7 @@ getCurrencySymbol = (currency = "THB") ->
     else currency
 
 
-module.exports =
+formatters =
   get: (path) -> _.get @, path
 
   image: (schema, row, opts) ->
@@ -35,10 +35,22 @@ module.exports =
     path = opts.path or opts._path
     "#{_.get row, path} #{getCurrencySymbol opts.currency}"
 
+  boolean: (schema, row, opts) ->
+    path = opts.path or opts._path
+
+    if _.get(row, opts._path)
+      <span className="boolean-value-true">&#10004;</span>
+    else
+      <span>&#10060;</span>
+
+
   date: (schema, row, opts) ->
     path = opts.path or opts._path
     displayFormat = opts.displayFormat or 'lll'
     moment(_.get(row, path)).format(displayFormat)
+
+  datetime: (schema, row, opts) ->
+    formatters.date schema, row, opts
 
   pre: (schema, row, opts) ->
     path = opts.path or opts._path
@@ -49,3 +61,6 @@ module.exports =
       row
 
     <pre>{value}</pre>
+
+
+module.exports = formatters

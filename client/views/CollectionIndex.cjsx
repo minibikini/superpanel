@@ -96,7 +96,7 @@ module.exports = (schema) ->
               f.displayName = fieldSchema.displayName
 
           formatter = f.formatter or @schema.getFormatter f.path
-          if formatter
+          if formatter and formatters.get(formatter)
             f.function = (row) => formatters.get(formatter)(@schema, row, f)
           else
             if fieldSchema?.type is 'datetime'
@@ -110,7 +110,7 @@ module.exports = (schema) ->
               when 'belongsTo' then [rel.getSchema().getRouteName('Show'), "#{rel.name}.#{rel.getSchema().getPk()}"]
 
             getLinkText = (row, path) =>
-              if formatter
+              if formatter and formatters.get(formatter)
                 formatters.get(formatter)(@schema, row, f)
               else
                 _.get(row, path)
@@ -125,7 +125,7 @@ module.exports = (schema) ->
             f.link.displayLabelPath ?= f._path
 
             getLinkText = (row, path) =>
-              if formatter
+              if formatter and formatters.get(formatter)
                 formatters.get(formatter)(@schema, row, f)
               else
                 _.get(row, path)

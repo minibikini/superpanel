@@ -96,7 +96,7 @@ module.exports = (schema, relation) ->
 
           formatter = f.formatter or relatedSchema.getFormatter f.path
 
-          if formatter
+          if formatter and formatters.get(formatter)
             f.function = (row) ->
               formatters.get(formatter)(relatedSchema, row, f)
 
@@ -106,7 +106,7 @@ module.exports = (schema, relation) ->
               when 'belongsTo' then [rel.getSchema().getRouteName('Show'), "#{rel.name}.#{rel.getSchema().getPk()}"]
 
             getLinkText = (row, path) =>
-              if formatter
+              if formatter and formatters.get(formatter)
                 formatters.get(formatter)(relatedSchema, row, f)
               else
                 _.get(row, path)
