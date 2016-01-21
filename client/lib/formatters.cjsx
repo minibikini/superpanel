@@ -29,46 +29,38 @@ formatters =
   get: (path) -> _.get @, path
 
   image: (schema, row, opts) ->
-    src = _.get row, opts.path or opts._path
+    src = _.get row, opts.path
     if _.isEmpty(src)
       <span style={color:'#666'}>N/A</span>
     else
-      <img src={_.get row, opts.path or opts._path} />
+      <img src={_.get row, opts.path} />
 
   money: (schema, row, opts) ->
-    path = opts.path or opts._path
-    "#{_.get row, path}#{getCurrencySymbol opts.currency}"
+    "#{_.get row, opts.path}#{getCurrencySymbol opts.currency}"
 
   boolean: (schema, row, opts) ->
-    path = opts.path or opts._path
-
-    if _.get(row, path)
+    if _.get(row, opts.path)
       <span className="boolean-value-true">&#10004;</span>
     else
       <span>&#10060;</span>
 
   string: (schema, row, opts) ->
-    path = opts.path or opts._path
-    value = _.get(row, path)
+    value = _.get(row, opts.path)
     if _.isEmpty(value) then <span style={color:'#666'}>N/A</span> else value
 
   null: (schema, row, opts) ->
     <span style={color:'#666'}>null</span>
 
   date: (schema, row, opts) ->
-    path = opts.path or opts._path
     displayFormat = opts.displayFormat or 'lll'
-    moment(_.get(row, path)).format(displayFormat)
-
+    moment(_.get(row, opts.path)).format(displayFormat)
 
   datetime: (schema, row, opts) ->
     formatters.date schema, row, opts
 
   pre: (schema, row, opts) ->
-    path = opts.path or opts._path
-
-    value = if path
-      _.get row, path
+    value = if opts.path
+      _.get row, opts.path
     else
       row
 

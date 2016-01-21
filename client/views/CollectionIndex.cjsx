@@ -89,7 +89,6 @@ module.exports = (schema) ->
       fields = for f in fields
         do (f) =>
           f = {displayName: titleize(underscore(f)), path: f} if _.isString f
-          f._path ?= f.path
 
           if fieldSchema = @schema.get "items.properties.#{f.path}"
             if fieldSchema.displayName
@@ -98,11 +97,6 @@ module.exports = (schema) ->
           formatter = f.formatter or @schema.getFormatter f.path
           if formatter and formatters.get(formatter)
             f.function = (row) => formatters.get(formatter)(@schema, row, f)
-          else
-            if fieldSchema?.type is 'datetime'
-              f.function = (row) =>
-                f.displayFormat = fieldSchema.displayFormat
-                formatters.get('date')(@schema, row, f)
 
           if f.link and f.link.type is 'relation' and rel = @schema.getRelation f.link.to
             [to, idPath] = switch rel.type
@@ -117,12 +111,12 @@ module.exports = (schema) ->
 
             f.function = (row) =>
               if id = _.get row, idPath
-                <Link to={to} params={{id}}>{getLinkText(row, f._path)}</Link>
+                <Link to={to} params={{id}}>{getLinkText(row, f.path)}</Link>
 
           #  link to filter
           if f.link and f.link.type is 'filter'
             f.link.to ?= @context.router.getCurrentPathname()
-            f.link.displayLabelPath ?= f._path
+            f.link.displayLabelPath ?= f.path
 
             getLinkText = (row, path) =>
               if formatter and formatters.get(formatter)
@@ -131,15 +125,18 @@ module.exports = (schema) ->
                 _.get(row, path)
 
             f.function = (row) =>
-              filter = _.defaults {}, f.link.filter, value: _.get(row, f._path)
+              filter = _.defaults {}, f.link.filter, value: _.get(row, f.path)
 
               if f.link.to is @context.router.getCurrentPathname()
                 <Link to={f.link.to} onClick={@updateFilter.bind(@, filter)} query={{filter}}>{getLinkText(row, f.link.displayLabelPath)}</Link>
               else
                 <Link to={f.link.to} query={{filter}}>{getLinkText(row, f.link.displayLabelPath)}</Link>
 
-          delete f.path if f.function?
-          f
+          if f.function?
+            _.omit f, 'path'
+          else
+            f
+
 
       if (actions = @schema.get('views.index.actions')) and actions?.length
         fields.push

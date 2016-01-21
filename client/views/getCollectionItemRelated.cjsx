@@ -78,22 +78,19 @@ module.exports = (schema, relation) ->
 
     getColumns: ->
       fields = relatedViewSchema?.fields
+
       unless fields
         fields = if @state.items.length
           for key, value of @state.items[0] when not _.isArray(value) and not _.isObject(value)
             {displayName: titleize(underscore(key)), path: key}
         else []
 
-      columns = for f in fields
-        do (f) ->
-          f = {displayName: titleize(underscore(f)), path: f} if _.isString f
-          f._path = f.path
-
-          if fieldSchema = relatedSchema.get "items.properties.#{f.path}"
-            f.function ?= switch fieldSchema.format
-              when 'datetime' then formatDate(f.path)
-              when 'date' then formatDate f.path, fieldSchema.dateFormat or 'll'
-              else undefined
+      columns = for field in fields
+        do (field) ->
+          f = if _.isString field
+            {displayName: titleize(underscore(field)), path: field}
+          else
+            Object.assign {}, field
 
           formatter = f.formatter or relatedSchema.getFormatter f.path
 
@@ -114,13 +111,12 @@ module.exports = (schema, relation) ->
 
             f.function = (row) =>
               if id = _.get row, idPath
-                <Link to={to} params={{id}}>{getLinkText(row, f._path)}</Link>
+                <Link to={to} params={{id}}>{getLinkText(row, f.path)}</Link>
 
-
-
-          delete f.path if f.function?
-          f
-
+          if f.function?
+            _.omit f, 'path'
+          else
+            f
 
       if (actions = relatedViewSchema?.actions) and actions?.length
         columns.push
