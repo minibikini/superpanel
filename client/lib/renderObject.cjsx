@@ -22,7 +22,7 @@ module.exports = renderObject = (schema, obj, propName) ->
     else
       value
 
-    if fieldOpts?.collectionLink
+    if fieldOpts?.collectionLink and value
       to = "resource#{fieldOpts.collectionLink}Show"
       formatted = <Link to={to} params={{id: value}}>{formatted}</Link>
 
