@@ -6,40 +6,41 @@ typeOf = require 'typeof'
 module.exports = renderObject = (schema, obj, propName) ->
   output = []
 
-  rows = for key, value of obj when not _.isObject(value) and not _.isArray(value)
-    do (key, value) ->
-      if fieldOpts = _.get schema, "properties.#{key}"
-        {displayName, type, formatter} = fieldOpts
+  formatProperty = (key, value) ->
+    fieldOpts = _.get(schema, "properties.#{key}") or {}
 
-      displayName ?= titleizeKey key
-      type ?= typeOf value
+    _.defaults fieldOpts,
+      displayName: titleizeKey key
+      type: typeOf value
+      path: key
+      formatter: fieldOpts.formatter or fieldOpts.type or typeOf value
 
-      formatted = if formatter
-        formatters.get(formatter)(schema, value, fieldOpts)
-      else
-        switch type
-          when 'string'
-            if _.isEmpty(value) then <span style={color:'#666'}>N/A</span> else value
-          when 'boolean'
-            if value then <span className="boolean-value-true">&#10004;</span> else <span>&#10060;</span>
-          when 'datetime'
-            moment(value).format fieldOpts.displayFormat or 'llll'
-          when 'null'
-            <span style={color:'#666'}>null</span>
-          else
-            value
+    {displayName, type, formatter} = fieldOpts
 
-      if fieldOpts?.collectionLink
-        to = "resource#{fieldOpts.collectionLink}Show"
-        formatted = <Link to={to} params={{id: value}}>{formatted}</Link>
+    formatted = if formatter and formatters.get(formatter)
+      formatters.get(formatter)(schema, obj, fieldOpts)
+    else
+      value
 
-      <tr key={key}><td><strong>{displayName}</strong></td><td>{formatted}</td></tr>
+    if fieldOpts?.collectionLink
+      to = "resource#{fieldOpts.collectionLink}Show"
+      formatted = <Link to={to} params={{id: value}}>{formatted}</Link>
+
+    <tr key={key}><td><strong>{displayName}</strong></td><td>{formatted}</td></tr>
+
+  propKeys = _.keys _.get(schema, "properties") or {}
+
+  rows = for key in propKeys when not _.isObject(obj[key]) and not _.isArray(obj[key])
+    formatProperty key, obj[key]
+
+  rows2 = for key, value of obj when (key not in propKeys) and not _.isObject(value) and not _.isArray(value)
+    formatProperty key, value
 
   output.push <h2 key="header">{schema?.displayName or titleizeKey propName}</h2>
 
   output.push <table key={Math.random()} className="horizontal striped">
     <tbody>
-      {rows}
+      {rows.concat rows2}
     </tbody>
   </table>
 
