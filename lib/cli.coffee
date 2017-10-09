@@ -62,6 +62,9 @@ runServer = ->
       # logger.debug schema
 
 if program.build or program.watch
+
+  process.chdir(program.path) if program.path
+
   webpack = require("webpack")
   compiler = webpack require("../webpack.config")
 
