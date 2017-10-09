@@ -71,7 +71,7 @@
     "qs": "^6.0.2",
     "react": "^0.14.1",
     "react-dom": "^0.14.1",
-    "react-pager": "^1.1.2",
+    "react-pager": "1.1.4",
     "react-router": "^0.13.5",
     "react-simple-table": "^0.6.0",
     "rethinkdbdash": "^2.0.10",

@@ -77,8 +77,8 @@ module.exports = (resources, controllers, projectRoot) ->
   app.on 'error', (err, ctx) ->
     logger.error err if err.status not in [403, 404]
 
-  app.listen config.port, ->
+  app.listen config.port, '0.0.0.0', ->
     app.emit "http.listen"
     time = Date.now() - startedAt
     logger.info "Started in #{time} ms"
-    logger.info "Listening at http://localhost:#{config.port}/"
+    logger.info "Listening at 0.0.0.0:#{config.port}"
